@@ -1,0 +1,15 @@
+Cuatrimestre,Asignatura,Correlatividad de Asignaturas
+3,Álgebra I,CBC
+3,Algoritmos y Estructuras de Datos I,CBC
+4,Análisis I,CBC
+4,Electiva de Introducción a las Ciencias Naturales,CBC
+5,Análisis II,Análisis I
+5,Álgebra Lineal Computacional,Álgebra I – Algoritmos y Estructuras de Datos I
+5,Laboratorio de Datos,Algoritmos y Estructuras de Datos I
+6,Análisis Avanzado,"Análisis II, Álgebra I"
+6,Algoritmos y Estructuras de Datos II,Algoritmos y Estructuras de Datos I
+7,Probabilidad,Análisis Avanzado
+7,Algoritmos y Estructura de Datos III,Algoritmos y Estructuras de Datos II
+8,Intr. a la Estadística y Ciencia de Datos,"Lab de Datos, Probabilidad, Álgebra Lineal Computacional"
+8,Intr. a la Investigación Operativa y Optimización,"Alg y Estruc de Datos III, Análisis II, Álgebra Lineal Computacional"
+8,Intr. al Modelado Continuo.,"Análisis Avanzado, Álgebra Lineal Computacional, Alg y Estructura de Datos II"
