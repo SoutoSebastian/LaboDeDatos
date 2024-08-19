@@ -34,25 +34,25 @@ df.sample(n = 3)
 
 #%% manejo de valores NaN
 
-df.isna()
+df.isna()  ##te da el dataFrame con True o False si es nan o no.
 
-df.notna()
+df.notna()  ##te da el dataFrame con True o False si no es nan o si es.
 
-df.dropna()
+df.dropna()  ##te saca toda la fila que tiene valores nan.
 
-df.dropna(axis='columns')
+df.dropna(axis='columns') ##te saca toda la columna que tiene algun valor nan.
 
 df.dropna(how='all') # solo si TODA la fila es nula
 
-df.dropna(thresh=2) # solo si tiene muy pocos campos (trhesh) no-nan
+df.dropna(thresh=2) # solo si tiene muy pocos campos (trhesh) no-nan <2
 
 df.dropna(subset=['nombre', 'apellido'])
-
+                                                ## te saca la fila que tenga nan en esas columnas
 df.dropna(subset=['nota1', 'apellido'])
 
-df.fillna(0)
+df.fillna(0) #te cambia los nan por 0
 
-values = {"nota1": 0, "nota2": 0, "aprueba": False}
+values = {"nota1": 0, "nota2": 0, "aprueba": False}     #te llena los valores nan en las columnas con esos valores.
 df.fillna(value=values)
 
 
@@ -139,7 +139,7 @@ df.isin({'nota1': [6,7]})
 
 df.eval('nota_final = nota1 + 1')
 
-df.eval('promedio = 0.5*nota1 + 0.5*nota2')
+df.eval('promedio = 0.5*nota1 + 0.5*nota2') ##le agrega una columna al dataframe.
 
 
 df.applymap(lambda x: len(str(x))) # defino la funcion acá mismo
@@ -229,8 +229,63 @@ a = df.to_numpy() # con tipos mixtos no
 
 d = df[['nota1', 'nota2']].dropna().to_numpy()
 
-df['nota1'].unique() 
+df['nota1'].unique() ##todos los valores que hay sacando repetidos
 
-df['nota1'].value_counts(dropna = False)
+df['nota1'].value_counts(dropna = False) ##cuantas veces hay cada valor
 
 df.where(df['nota1'] > 6, 0) # donde no es mayor a 6 pongo 0
+
+
+################EJERCICIO DE ARBOLES EN BSAS
+
+import pandas as pd
+import numpy as np
+
+archivo = 'arbolado-en-espacios-verdes.csv'
+
+df = pd.read_csv(archivo, index_col = 2)
+
+dJ = df[df['nombre_com']== 'Jacarandá'] ##armo el dataframe de jacarandas
+
+dJ['nombre_com'].value_counts(dropna = False) ##cuento la cantidad de arboles (3225)
+
+dJ.sort_values(by = 'altura_tot', ascending = False) ##ordeno por altura decreciente y tengo el mas alto (49)
+
+dJ.sort_values(by = 'altura_tot') ##ordeno por altura creciente (1)
+
+#altura promedio
+suma_alturas = 0
+for e in dJ.itertuples():
+    suma_alturas += e.altura_tot
+    
+promedio = suma_alturas / 3225
+
+print(str(promedio))  ##10.466046511627907
+
+dJ.sort_values(by = 'diametro', ascending = False) ##(159)
+
+dJ.sort_values(by = 'diametro') ##(1)
+
+#diametro promedio
+
+suma_diametros = 0
+for e in dJ.itertuples():
+    suma_diametros += e.diametro
+    
+promediod = suma_diametros / 3225
+
+print(str(promediod))  ##29.072248062015504
+
+
+def cantidad_arboles3(parque:str):
+    res =  (dJ['espacio_ve']==parque).sum()
+    print (res)
+    
+def cantidad_nativos2(parque:str):
+    dParque = dJ[dJ['espacio_ve']==parque]
+    res = (dParque['origen']=='Nativo/Autóctono').sum()
+    print(res)
+    
+#Palos borrachos ( hay distintos tipos entonces armo el data frame por el nombre_fam)
+
+dPB = df[df['nombre_fam']=='Bombacáceas'] # creo el data frame y despues es todo lo mismo que las otras
