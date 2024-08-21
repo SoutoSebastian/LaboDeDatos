@@ -354,3 +354,42 @@ def especie_promedio_mas_inclinada(lista_arboles):
             especie = listaEspecies[i]
             
     return [especie, maxprom]
+
+#Arboles en veredad
+
+dv = pd.read_csv('arbolado-publico-lineal-2017-2018.csv', index_col = 2)
+dv2 = dv[['nombre_cientifico', 'ancho_acera', 'diametro_altura_pecho', 'altura_arbol']]
+
+especies_seleccionadas = ['Tilia x moltkei', 'Jacaranda mimosifolia', 'Tipuana tipu']
+
+#EJ8
+#parques:
+#creo los dataframes con las columnas pedidas
+df_tipas_parques = df[df['nombre_cie']=='Tipuana Tipu'][['diametro','altura_tot']]
+df_tipas_veredas = dv[dv['nombre_cientifico']=='Tipuana tipu'][['diametro_altura_pecho','altura_arbol']]
+
+#cambio los nombres para que queden columnas con los mismos nombres en ambos dataframes
+df_tipas_veredas = df_tipas_veredas.rename(columns={'diametro_altura_pecho':'diametro'})
+df_tipas_parques = df_tipas_parques.rename(columns={'altura_tot':'altura_arbol'})
+
+#EJ9
+df_tipas_veredas['ambiente']='vereda'
+df_tipas_parques['ambiente']='parque'
+
+#EJ10
+df_tipas_vyp = pd.concat([df_tipas_parques, df_tipas_veredas])
+
+#EJ11
+#voy a sacar diametro max, min y prom y altura max min y prom para cada dataframe y comparar.
+
+#max
+df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda'].agg('max') #diametro = 199, altura = 40
+df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('max') #diametro = 261, altura = 48
+
+#min
+df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda'].agg('min') #diametro = 0.0, altura = 2
+df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('min') #diametro = 1, altura = 1
+
+#prom
+df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda']['diametro','altura_arbol'].agg('mean') #diametro = 54.142719, altura = 15.056567
+df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('mean') #diametro = 57.994294, altura = 19.100223
