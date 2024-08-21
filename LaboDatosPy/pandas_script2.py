@@ -236,7 +236,7 @@ df['nota1'].value_counts(dropna = False) ##cuantas veces hay cada valor
 df.where(df['nota1'] > 6, 0) # donde no es mayor a 6 pongo 0
 
 
-################EJERCICIO DE ARBOLES EN BSAS
+################EJERCICIO DE ARBOLES EN BSAS CLASE
 
 import pandas as pd
 import numpy as np
@@ -289,3 +289,68 @@ def cantidad_nativos2(parque:str):
 #Palos borrachos ( hay distintos tipos entonces armo el data frame por el nombre_fam)
 
 dPB = df[df['nombre_fam']=='Bombacáceas'] # creo el data frame y despues es todo lo mismo que las otras
+
+#####EJERCICIO
+
+#EJ1
+def leer_parque(nombre_archivo, parque):
+    df = pd.read_csv(nombre_archivo, index_col = 2)
+    
+    dP = df[df['espacio_ve']==parque]
+    
+    return dP
+
+#EJ2
+def especies(lista_arboles):
+    res = lista_arboles['nombre_com'].unique()
+    return res
+
+#EJ3
+def contar_ejemplares(lista_arboles):
+    res = lista_arboles['nombre_com'].value_counts(dropna = False)
+    
+    return res
+
+#EJ4
+def obtener_alturas(lista_arboles, especie):
+    lAlturas = lista_arboles[lista_arboles['nombre_com']==especie]['altura_tot']
+    
+    return lAlturas
+
+#EJ5
+def obtener_inclinaciones(lista_arboles, especie):
+    lInclinacion = lista_arboles[lista_arboles['nombre_com']==especie]['inclinacio']
+    
+    return lInclinacion
+
+#EJ6
+def especimen_mas_inclinado(lista_arboles):
+    listaEspecies = especies(lista_arboles)
+    max = -1
+    especie :str
+    
+    for i in range (len(listaEspecies)):
+        inclinacion_por_especie = obtener_inclinaciones(lista_arboles,listaEspecies[i])
+        maximo_por_especie = inclinacion_por_especie.agg('max')
+        
+        if(maximo_por_especie >= max):
+            max = maximo_por_especie
+            especie = listaEspecies[i]
+            
+    return [especie, max]
+
+#EJ7
+def especie_promedio_mas_inclinada(lista_arboles):
+    listaEspecies = especies(lista_arboles)
+    maxprom = -1
+    especie :str
+    
+    for i in range (len(listaEspecies)):
+        inclinacion_por_especie = obtener_inclinaciones(lista_arboles,listaEspecies[i])
+        promedio_por_especie = inclinacion_por_especie.agg('mean')
+        
+        if(promedio_por_especie >= maxprom):
+            maxprom = promedio_por_especie
+            especie = listaEspecies[i]
+            
+    return [especie, maxprom]
