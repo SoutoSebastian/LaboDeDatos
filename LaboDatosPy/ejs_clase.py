@@ -58,6 +58,14 @@ def leer_parque(nombre_archivo, parque):
 
 a = leer_parque(archivo, 'GENERAL PAZ')
 
+def especies(lista_arboles):
+    res = []
+    
+    for i in range(len(lista_arboles)):
+        if lista_arboles[i]['nombre_com'] not in res:
+            res.append(lista_arboles[i]['nombre_com'])
+    
+    return res
         
         
         
