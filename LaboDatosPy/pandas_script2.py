@@ -235,161 +235,36 @@ df['nota1'].value_counts(dropna = False) ##cuantas veces hay cada valor
 
 df.where(df['nota1'] > 6, 0) # donde no es mayor a 6 pongo 0
 
+#Algunas cosas de la clase
+#Abriendo archivos
+# con '../Descargas/datame.txt' voy armando el path para llegar al archivo
 
-################EJERCICIO DE ARBOLES EN BSAS CLASE
+nombre_archivo = 'datame.txt'
 
-import pandas as pd
-import numpy as np
+f = open(nombre_archivo, 'rt')
 
-archivo = 'arbolado-en-espacios-verdes.csv'
+data = f.read()
 
-df = pd.read_csv(archivo, index_col = 2)
+print(data)
+f.read()
+f.close()
 
-dJ = df[df['nombre_com']== 'Jacarandá'] ##armo el dataframe de jacarandas
+promedio = (df['nota1']+df['nota2'])/2
+df['promedio'] = promedio
 
-dJ['nombre_com'].value_counts(dropna = False) ##cuento la cantidad de arboles (3225)
+alu_nue = {'lu':['125/45'], 'nombre':['Juan'], 'apellido':['Perez'], 'nota1':[2], 'nota2':[10]}
 
-dJ.sort_values(by = 'altura_tot', ascending = False) ##ordeno por altura decreciente y tengo el mas alto (49)
+df_alu_nue = pd.DataFrame(data = alu_nue)
+df_alu_nue.set_index('lu', inplace = True)
 
-dJ.sort_values(by = 'altura_tot') ##ordeno por altura creciente (1)
+df_nuevo = pd.concat([df, df_alu_nue])
 
-#altura promedio
-suma_alturas = 0
-for e in dJ.itertuples():
-    suma_alturas += e.altura_tot
-    
-promedio = suma_alturas / 3225
+df_nuevo.loc['125/45', 'promedio'] = 1
 
-print(str(promedio))  ##10.466046511627907
+df_nuevo.loc['125/45', 'promedio'] = (df_nuevo.loc['125/45','nota1'] + df_nuevo.loc['125/45', 'nota2'])/2
 
-dJ.sort_values(by = 'diametro', ascending = False) ##(159)
+df_nuevo['aprueba'] = (df_nuevo['nota1'] >= 5) & (df_nuevo['nota2'] >= 5)
 
-dJ.sort_values(by = 'diametro') ##(1)
+df_nuevo['promociona'] = (df_nuevo['nota1'] >= 8) & (df_nuevo['nota2'] >= 8)
 
-#diametro promedio
-
-suma_diametros = 0
-for e in dJ.itertuples():
-    suma_diametros += e.diametro
-    
-promediod = suma_diametros / 3225
-
-print(str(promediod))  ##29.072248062015504
-
-
-def cantidad_arboles3(parque:str):
-    res =  (dJ['espacio_ve']==parque).sum()
-    print (res)
-    
-def cantidad_nativos2(parque:str):
-    dParque = dJ[dJ['espacio_ve']==parque]
-    res = (dParque['origen']=='Nativo/Autóctono').sum()
-    print(res)
-    
-#Palos borrachos ( hay distintos tipos entonces armo el data frame por el nombre_fam)
-
-dPB = df[df['nombre_fam']=='Bombacáceas'] # creo el data frame y despues es todo lo mismo que las otras
-
-#####EJERCICIO
-
-#EJ1
-def leer_parque(nombre_archivo, parque):
-    df = pd.read_csv(nombre_archivo, index_col = 2)
-    
-    dP = df[df['espacio_ve']==parque]
-    
-    return dP
-
-#EJ2
-def especies(lista_arboles):
-    res = lista_arboles['nombre_com'].unique()
-    return res
-
-#EJ3
-def contar_ejemplares(lista_arboles):
-    res = lista_arboles['nombre_com'].value_counts(dropna = False)
-    
-    return res
-
-#EJ4
-def obtener_alturas(lista_arboles, especie):
-    lAlturas = lista_arboles[lista_arboles['nombre_com']==especie]['altura_tot']
-    
-    return lAlturas
-
-#EJ5
-def obtener_inclinaciones(lista_arboles, especie):
-    lInclinacion = lista_arboles[lista_arboles['nombre_com']==especie]['inclinacio']
-    
-    return lInclinacion
-
-#EJ6
-def especimen_mas_inclinado(lista_arboles):
-    listaEspecies = especies(lista_arboles)
-    max = -1
-    especie :str
-    
-    for i in range (len(listaEspecies)):
-        inclinacion_por_especie = obtener_inclinaciones(lista_arboles,listaEspecies[i])
-        maximo_por_especie = inclinacion_por_especie.agg('max')
-        
-        if(maximo_por_especie >= max):
-            max = maximo_por_especie
-            especie = listaEspecies[i]
-            
-    return [especie, max]
-
-#EJ7
-def especie_promedio_mas_inclinada(lista_arboles):
-    listaEspecies = especies(lista_arboles)
-    maxprom = -1
-    especie :str
-    
-    for i in range (len(listaEspecies)):
-        inclinacion_por_especie = obtener_inclinaciones(lista_arboles,listaEspecies[i])
-        promedio_por_especie = inclinacion_por_especie.agg('mean')
-        
-        if(promedio_por_especie >= maxprom):
-            maxprom = promedio_por_especie
-            especie = listaEspecies[i]
-            
-    return [especie, maxprom]
-
-#Arboles en veredad
-
-dv = pd.read_csv('arbolado-publico-lineal-2017-2018.csv', index_col = 2)
-dv2 = dv[['nombre_cientifico', 'ancho_acera', 'diametro_altura_pecho', 'altura_arbol']]
-
-especies_seleccionadas = ['Tilia x moltkei', 'Jacaranda mimosifolia', 'Tipuana tipu']
-
-#EJ8
-#parques:
-#creo los dataframes con las columnas pedidas
-df_tipas_parques = df[df['nombre_cie']=='Tipuana Tipu'][['diametro','altura_tot']]
-df_tipas_veredas = dv[dv['nombre_cientifico']=='Tipuana tipu'][['diametro_altura_pecho','altura_arbol']]
-
-#cambio los nombres para que queden columnas con los mismos nombres en ambos dataframes
-df_tipas_veredas = df_tipas_veredas.rename(columns={'diametro_altura_pecho':'diametro'})
-df_tipas_parques = df_tipas_parques.rename(columns={'altura_tot':'altura_arbol'})
-
-#EJ9
-df_tipas_veredas['ambiente']='vereda'
-df_tipas_parques['ambiente']='parque'
-
-#EJ10
-df_tipas_vyp = pd.concat([df_tipas_parques, df_tipas_veredas])
-
-#EJ11
-#voy a sacar diametro max, min y prom y altura max min y prom para cada dataframe y comparar.
-
-#max
-df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda'].agg('max') #diametro = 199, altura = 40
-df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('max') #diametro = 261, altura = 48
-
-#min
-df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda'].agg('min') #diametro = 0.0, altura = 2
-df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('min') #diametro = 1, altura = 1
-
-#prom
-df_tipas_vyp[df_tipas_vyp['ambiente']=='vereda']['diametro','altura_arbol'].agg('mean') #diametro = 54.142719, altura = 15.056567
-df_tipas_vyp[df_tipas_vyp['ambiente']=='parque'].agg('mean') #diametro = 57.994294, altura = 19.100223
+df_aprobados = df_nuevo[df_nuevo['nota1']>=5]
