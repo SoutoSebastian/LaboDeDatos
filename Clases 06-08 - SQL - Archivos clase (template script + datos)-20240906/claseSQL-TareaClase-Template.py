@@ -15,7 +15,7 @@ from inline_sql import sql, sql_val
 # Importamos los datasets que vamos a utilizar en este programa
 #=============================================================================
 
-carpeta = "~/Descargas/Clases 06-08 - SQL - Archivos clase (template script + datos)-20240906"
+carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\Clases 06-08 - SQL - Archivos clase (template script + datos)-20240906"
 
 # Ejercicios AR-PROJECT, SELECT, RENAME
 empleado       = pd.read_csv(carpeta+"empleado.csv")
