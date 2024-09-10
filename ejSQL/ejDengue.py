@@ -11,7 +11,9 @@ from inline_sql import sql, sql_val
 
 #%%
 
-carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
+#carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
+
+carpeta = "~/Escritorio/LaboDeDatos/ejSQL/"
 
 casos = pd.read_csv(carpeta+"casos.csv")
 
@@ -503,6 +505,155 @@ dataframeResultado = sql^"""
                           ON c.id_depto = c1.id_depto;
                          """
                          
+
+#%%
+
+
+#ej E
+
+#a
+
+casosConDepto = sql^"""
+                SELECT DISTINCT c.id_depto, d.descripcion, SUM(c.cantidad) AS cantidad_casos
+                FROM casos as c
+                INNER JOIN departamento as d
+                ON c.id_depto = d.id
+                GROUP BY c.id_depto, d.descripcion;
+              """
+
+DeptoConMasCasos = sql^"""
+                        SELECT c1.descripcion
+                        FROM casosConDepto AS c1
+                        WHERE c1.cantidad_casos >= ALL (
+                            SELECT c2.cantidad_casos
+                            FROM casosConDepto AS c2
+                            );
+                      """
+
+#%%
+
+#b
+
+dataframeResultado = sql^"""
+                         SELECT te.descripcion
+                         FROM tipoevento AS te
+                         WHERE te.id = ANY (
+                             SELECT DISTINCT c.id_tipoevento
+                             FROM casos AS c
+                             );
+                        """
+
+#%%
+
+#EJF
+
+#a
+
+dataframeResultado = sql^"""
+                          SELECT te.descripcion
+                          FROM tipoevento AS te
+                          WHERE te.id IN(
+                              SELECT DISTINCT c.id_tipoevento
+                              FROM casos AS c
+                              );
+                         """
+                         
+#%%
+
+#b
+
+dataframeResultado = sql^"""
+                          SELECT te.descripcion
+                          FROM tipoevento AS te
+                          WHERE te.id NOT IN(
+                              SELECT DISTINCT c.id_tipoevento
+                              FROM casos AS c
+                              );
+                         """
+
+#%%
+
+#EJH
+
+#a
+
+dataframeResultado = sql^"""
+                          SELECT te.descripcion
+                          FROM tipoevento AS te
+                          WHERE EXISTS (
+                              SELECT DISTINCT c.id_tipoevento
+                              FROM casos AS c
+                              WHERE te.id = c.id_tipoevento
+                              );
+                         """
+
+#%%
+
+#b
+
+dataframeResultado = sql^"""
+                          SELECT te.descripcion
+                          FROM tipoevento AS te
+                          WHERE NOT EXISTS (
+                              SELECT DISTINCT c.id_tipoevento
+                              FROM casos AS c
+                              WHERE te.id = c.id_tipoevento
+                              );
+                         """
+                      
+#%%
+
+#EJH
+
+#a
+
+casosConDepto = sql^"""
+                SELECT DISTINCT c.id_depto, d.descripcion AS depto, d.id_provincia, c.cantidad, c.anio
+                FROM casos as c
+                INNER JOIN departamento as d
+                ON c.id_depto = d.id
+              """
+
+casosConProv = sql^"""
+                    SELECT DISTINCT c.id_depto, c.depto, c.id_provincia, p.descripcion AS prov, c.cantidad, c.anio
+                    FROM casosConDepto AS c
+                    INNER JOIN provincia AS p 
+                    ON c.id_provincia = p.id
+                   """
+
+casosProv = sql^"""
+                 SELECT DISTINCT c.anio, c.prov, SUM(c.cantidad) AS cantidad_casos
+                 FROM casosConProv AS c
+                 GROUP BY c.anio, c.prov;
+                """
+
+
+dataframeResultado = sql^"""
+                          SELECT DISTINCT c1.anio, c1.prov, c1.cantidad_casos
+                          FROM casosProv AS c1
+                          WHERE c1.cantidad_casos >= (
+                              SELECT AVG(c2.cantidad_casos)
+                              FROM casosProv AS c2
+                              );
+                         
+                         """
+
+#%%
                          
                          
+#b
                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
