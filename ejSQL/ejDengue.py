@@ -11,9 +11,9 @@ from inline_sql import sql, sql_val
 
 #%%
 
-#carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
+carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
 
-carpeta = "~/Escritorio/LaboDeDatos/ejSQL/"
+#carpeta = "~/Escritorio/LaboDeDatos/ejSQL/"
 
 casos = pd.read_csv(carpeta+"casos.csv")
 
@@ -191,6 +191,15 @@ consultaSQL = """
 
 dataframeResultado = sql^ consultaSQL
 
+departamentosC = sql^"""
+                      SELECT DISTINCT id_depto
+                      FROM casos
+                     """
+departamentos = sql^"""
+                     SELECT DISTINCT id
+                     FROM departamento
+                    """
+
 #%% 
 #b
 
@@ -221,8 +230,8 @@ dataframeResultado = sql^ consultaSQL
 
 #b
 tablaCasosEvento = sql^"""
-                        SELECT DISTINCT te.descripcion, c.anio, c.cantidad
-                        FROM casos AS C
+                        SELECT DISTINCT te.descripcion, c.anio, c.cantidad, c.id
+                        FROM casos AS c
                         INNER JOIN tipoevento as te
                         ON c.id_tipoevento = te.id
                    """
@@ -235,6 +244,8 @@ consultaSQL = """
                 ORDER BY descripcion ASC, anio ASC;
               """
 
+
+
 dataframeResultado = sql^ consultaSQL
 
 #%%
@@ -242,8 +253,8 @@ dataframeResultado = sql^ consultaSQL
 #c
 
 tablaCasosEvento = sql^"""
-                        SELECT DISTINCT te.descripcion, c.anio, c.cantidad
-                        FROM casos AS C
+                        SELECT DISTINCT te.descripcion, c.anio, c.cantidad, c.id
+                        FROM casos AS c
                         INNER JOIN tipoevento as te
                         ON c.id_tipoevento = te.id
                         WHERE c.anio = 2019;
@@ -265,7 +276,7 @@ dataframeResultado = sql^ consultaSQL
 #d
 
 consultaSQL = """
-                SELECT DISTINCT id_provincia, p.descripcion,  count(*) as cantidad_deptos
+                SELECT id_provincia, p.descripcion,  count(*) as cantidad_deptos
                 FROM departamento AS d
                 INNER JOIN provincia AS p
                 ON d.id_provincia = p.id
@@ -274,6 +285,7 @@ consultaSQL = """
               """
 
 dataframeResultado = sql^ consultaSQL
+
 
 #%%
 
@@ -286,8 +298,8 @@ consultaSQL = sql^"""
                 ON d.id = c.id_depto
                 WHERE c.anio = 2019
                 GROUP BY d.id, d.descripcion
-                ORDER BY cantidad_casos ASC
-                LIMIT 10;
+                HAVING cantidad_casos = 1
+                ORDER BY cantidad_casos ASC;
               """
 
                          
@@ -306,6 +318,7 @@ consultaSQL = """
                 LIMIT 10;
               """
 
+
 dataframeResultado = sql^ consultaSQL
 
 
@@ -315,23 +328,24 @@ dataframeResultado = sql^ consultaSQL
 #g
 
 casosConDepto = sql^"""
-                SELECT DISTINCT c.anio, c.cantidad, d.id_provincia
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
               """
               
 casosConProv = sql^"""
-                    SELECT DISTINCT c.anio, c.cantidad, p.descripcion
+                    SELECT DISTINCT c.id, c.anio, c.cantidad, p.descripcion AS prov
                     FROM casosConDepto as c
                     INNER JOIN provincia as p
                     ON c.id_provincia = p.id
                    """
 
 dataframeResultado = sql^"""
-                          SELECT DISTINCT anio, descripcion, AVG(cantidad) AS prom_cantidad
+                          SELECT  anio, prov, AVG(cantidad) AS prom_cantidad
                           FROM casosConProv
-                          GROUP BY anio, descripcion
+                          GROUP BY anio, prov
+                          ORDER BY anio;
                          """
 
 #%%
@@ -339,14 +353,14 @@ dataframeResultado = sql^"""
 #h
 
 casosConDepto = sql^"""
-                SELECT DISTINCT c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
               """
               
 casosConProv = sql^"""
-                    SELECT DISTINCT c.anio, c.cantidad, c.depto, p.descripcion AS prov, 
+                    SELECT DISTINCT c.id, c.anio, c.cantidad, c.depto, p.descripcion AS prov, 
                     FROM casosConDepto as c
                     INNER JOIN provincia as p
                     ON c.id_provincia = p.id
@@ -370,13 +384,13 @@ dataFrameResultado = sql^"""
                          ON c.prov = max_casos.prov AND c.anio = max_casos.anio AND c.cant_total = max_casos.max_cant_total
                          ORDER BY c.prov, c.anio;
                          """
-                         
+
 #%%                         
                          
 #i
                          
 casosConDepto = sql^"""
-                SELECT DISTINCT c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
@@ -384,7 +398,7 @@ casosConDepto = sql^"""
               """
 
 casosBSAS = sql^"""
-                 SELECT DISTINCT c.anio, c.cantidad, p.descripcion
+                 SELECT DISTINCT c.id, c.anio, c.cantidad, p.descripcion
                  FROM casosConDepto as c
                  INNER JOIN provincia as p
                  ON c.id_provincia = p.id
@@ -400,7 +414,7 @@ dataFrameResultado = sql^"""
      
 #j                    
 casosConDepto = sql^"""
-                SELECT DISTINCT c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
@@ -408,7 +422,7 @@ casosConDepto = sql^"""
               """
 
 casosBSAS = sql^"""
-                 SELECT DISTINCT c.anio, c.cantidad, p.descripcion
+                 SELECT DISTINCT c.id, c.anio, c.cantidad, p.descripcion
                  FROM casosConDepto as c
                  INNER JOIN provincia as p
                  ON c.id_provincia = p.id
@@ -418,6 +432,29 @@ casosBSAS = sql^"""
 dataFrameResultado = sql^"""
                           SELECT SUM(cantidad) AS casos_totales, MAX(cantidad) AS casos_max, MIN(cantidad) AS casos_min, AVG(cantidad) AS casos_prom
                           FROM casosBSAS
+                         """
+#no entiendo bien la consigna, otra opcion seria ver todas las provincias que tengan cant_total > 1000
+
+
+casosConDepto = sql^"""
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
+                FROM casos as c
+                INNER JOIN departamento as d
+                ON c.id_depto = d.id
+              """
+
+casosConProv = sql^"""
+                 SELECT DISTINCT c.id, c.anio, c.cantidad, p.descripcion AS prov
+                 FROM casosConDepto as c
+                 INNER JOIN provincia as p
+                 ON c.id_provincia = p.id;
+                """  
+
+dataFrameResultado2 = sql^"""
+                          SELECT prov, SUM(cantidad) AS casos_totales, MAX(cantidad) AS casos_max, MIN(cantidad) AS casos_min, AVG(cantidad) AS casos_prom
+                          FROM casosConProv
+                          GROUP BY prov
+                          HAVING casos_totales >1000
                          """                         
 
 #%%
@@ -425,14 +462,14 @@ dataFrameResultado = sql^"""
 #k
 
 casosConDepto = sql^"""
-                SELECT DISTINCT c.anio, c.cantidad, d.id_provincia, d.descripcion AS depto
+                SELECT DISTINCT c.id, c.anio, c.cantidad, d.id_provincia, d.id AS id_depto, d.descripcion AS depto
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
               """
 
 casosConProv = sql^"""
-                    SELECT DISTINCT c.anio, c.cantidad, c.depto, p.descripcion AS prov
+                    SELECT DISTINCT c.id, c.anio, c.cantidad, c.id_depto, c.depto, p.descripcion AS prov
                     FROM casosConDepto AS c
                     INNER JOIN provincia AS p 
                     ON c.id_provincia = p.id
@@ -441,15 +478,38 @@ casosConProv = sql^"""
 deptos19Y20 = sql^"""
                     SELECT DISTINCT c1.prov, c1.depto, AVG(c1.cantidad) AS prom
                     FROM casosConProv as c1
-                    WHERE c1.depto IN (
-                        SELECT DISTINCT depto
+                    WHERE c1.id_depto IN (
+                        SELECT DISTINCT c2.id_depto
                         FROM casosConProv AS c2
-                        GROUP BY c2.depto
+                        GROUP BY c2.prov, c2.id_depto
                         HAVING COUNT(DISTINCT c2.anio) = 2
                         )
                     GROUP BY c1.prov, c1.depto
-                    ORDER BY c1.prov, c1.depto;
+                    ORDER BY c1.depto, c1.prov, c1.depto;
                   """
+
+#otra opcion con interseccion:
+
+deptos19 = sql^"""
+                SELECT DISTINCT  id_depto
+                FROM casosConProv
+                WHERE anio = 2019
+               """
+deptos20 = sql^"""
+                SELECT DISTINCT  id_depto
+                FROM casosConProv
+                WHERE anio = 2020
+               """               
+
+deptosAmbosAños = sql^"""
+                        SELECT DISTINCT *
+                        FROM deptos19
+                        INTERSECT
+                        SELECT DISTINCT *
+                        FROM deptos20;
+                      """
+
+
                   
 #%%
 
@@ -457,14 +517,14 @@ deptos19Y20 = sql^"""
 
 
 casosConDepto = sql^"""
-                SELECT DISTINCT c.id_depto, d.descripcion AS depto, d.id_provincia, c.cantidad, c.id_tipoevento, c.anio
+                SELECT DISTINCT c.id, c.id_depto, d.descripcion AS depto, d.id_provincia, c.cantidad, c.id_tipoevento, c.anio
                 FROM casos as c
                 INNER JOIN departamento as d
                 ON c.id_depto = d.id
               """
 
 casosConProv = sql^"""
-                    SELECT DISTINCT c.id_depto, c.depto, c.id_provincia, p.descripcion AS prov, c.cantidad, c.id_tipoevento, c.anio
+                    SELECT DISTINCT c.id, c.id_depto, c.depto, c.id_provincia, p.descripcion AS prov, c.cantidad, c.id_tipoevento, c.anio
                     FROM casosConDepto AS c
                     INNER JOIN provincia AS p 
                     ON c.id_provincia = p.id
