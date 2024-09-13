@@ -15,7 +15,9 @@ from inline_sql import sql, sql_val
 # Importamos los datasets que vamos a utilizar en este programa
 #=============================================================================
 
-carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\Clases 06-08 - SQL - Archivos clase (template script + datos)-20240906"
+#carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\Clases 06-08 - SQL - Archivos clase (template script + datos)-20240906"
+
+carpeta = "~/Escritorio/LaboDeDatos/Clases 06-08 - SQL - Archivos clase (template script + datos)-20240906/"
 
 # Ejercicios AR-PROJECT, SELECT, RENAME
 empleado       = pd.read_csv(carpeta+"empleado.csv")
@@ -657,20 +659,85 @@ dataframeResultado = sql^ consultaSQL
 # a.- Mostrar para cada estudiante las siguientes columnas con sus datos: Nombre, Sexo, Edad, Nota-Parcial-01, Nota-Parcial-02, Recuperatorio-01 y , Recuperatorio-02
 
 # ... Paso 1: Obtenemos los datos de los estudiantes
-consultaSQL = """
-
+consultaSQLRecu1 = """
+                SELECT nombre, nota 
+                FROM examen
+                WHERE instancia = 'Recuperatorio-01'                
               """
 
+notasRecu1 = sql^consultaSQLRecu1 
 
-desafio_01 = consultaSQL
+consultaSQLRecu2 = """
+                SELECT nombre, nota 
+                FROM examen
+                WHERE instancia = 'Recuperatorio-02'                
+              """
 
+notasRecu2 = sql^consultaSQLRecu2
+
+consultaSQLParcial_01= """
+                SELECT  nombre, nota 
+                FROM examen
+                WHERE Instancia = 'Parcial-01'         
+              """
+
+notasParcial1 = sql^consultaSQLParcial_01
+
+
+consultaSQLParcial_02= """
+                SELECT nombre, nota 
+                FROM examen
+                WHERE instancia = 'Parcial-02'                
+              """
+
+notasParcial2 = sql^consultaSQLParcial_02
+
+consultaSQL = """
+                SELECT DISTINCT e.nombre, e.sexo, e.edad, p1.nota AS Parcial1, p2.nota AS Parcial2
+                FROM examen AS e
+                LEFT OUTER JOIN notasParcial1 as p1
+                ON e.nombre = p1.nombre
+                LEFT OUTER JOIN notasParcial2 as p2
+                ON p1.nombre = p2.nombre
+                ORDER BY e.nombre
+                
+              """
+
+desafio_01 = sql^consultaSQL
+
+consultaSQL = """
+                SELECT DISTINCT d.nombre, d.sexo, d.edad, d.Parcial1, d.Parcial2, r1.nota AS Recu1
+                FROM desafio_01 AS d
+                LEFT OUTER JOIN notasRecu1 as r1
+                ON d.nombre = r1.nombre
+                ORDER BY d.nombre            
+              """
+              
+desafio_01 = sql^consultaSQL              
+              
+consultaSQL = """
+                SELECT DISTINCT d.nombre, d.sexo, d.edad, d.Parcial1, d.Parcial2, d.Recu1, r2.nota AS Recu2
+                FROM desafio_01 AS d
+                LEFT OUTER JOIN notasRecu2 as r2
+                ON d.nombre = r2.nombre
+                ORDER BY d.nombre            
+              """              
+
+
+desafio_01 = sql^consultaSQL
 
 
 #%% -----------
 # b.- Agregar al ejercicio anterior la columna Estado, que informa si el alumno aprobó la cursada (APROBÓ/NO APROBÓ). Se aprueba con 4.
 
 consultaSQL = """
-                 
+                SELECT DISTINCT  nombre, sexo, edad, Parcial1, Parcial2, Recu1, Recu2, 
+                                 CASE WHEN (Parcial1 >= 4 AND Parcial2 >= 4) OR (Parcial1>=4 AND Recu2 >= 4 ) OR (Recu1 >=4 AND Parcial2 >=4) OR (Recu1 >= 4 AND Recu2>= 4)
+                                     THEN 'APROBO'
+                                     ELSE 'NO APROBO'
+                                 END AS ESTADO 
+                FROM desafio_01
+                ORDER BY nombre;
               """
 
 desafio_02 = sql^ consultaSQL
@@ -681,7 +748,77 @@ desafio_02 = sql^ consultaSQL
 # c.- Generar la tabla Examen a partir de la tabla obtenida en el desafío anterior.
 
 consultaSQL = """
-
+                SELECT DISTINCT d2.nombre, d2.sexo, d2.edad, i.Instancia, d2.Parcial1 AS Nota
+                FROM desafio_02 AS d2
+                INNER JOIN (SELECT DISTINCT e.nombre,
+                                      CASE WHEN 1=1
+                                           THEN 'Parcial-01'
+                                      END AS 'Instancia'
+                            FROM examen AS e) AS i
+                ON d2.nombre = i.nombre
               """
 
-desafio_03 = sql^ consultaSQL
+
+
+desafio_03_P1 = sql^ consultaSQL
+
+consultaSQL = """
+                SELECT DISTINCT d2.nombre, d2.sexo, d2.edad, i.Instancia, d2.Parcial2 AS Nota
+                FROM desafio_02 AS d2
+                INNER JOIN (SELECT DISTINCT e.nombre,
+                                      CASE WHEN 1=1
+                                           THEN 'Parcial-02'
+                                      END AS 'Instancia'
+                            FROM examen AS e) AS i
+                ON d2.nombre = i.nombre
+              """
+              
+desafio_03_P2 = sql^ consultaSQL
+
+consultaSQL = """
+                SELECT DISTINCT d2.nombre, d2.sexo, d2.edad, i.Instancia, d2.Recu1 AS Nota
+                FROM desafio_02 AS d2
+                INNER JOIN (SELECT DISTINCT e.nombre,
+                                      CASE WHEN 1=1
+                                           THEN 'Recuperatorio-01'
+                                      END AS 'Instancia'
+                            FROM examen AS e) AS i
+                ON d2.nombre = i.nombre
+              """
+              
+desafio_03_R1 = sql^ consultaSQL
+
+
+consultaSQL = """
+                SELECT DISTINCT d2.nombre, d2.sexo, d2.edad, i.Instancia, d2.Recu2 AS Nota
+                FROM desafio_02 AS d2
+                INNER JOIN (SELECT DISTINCT e.nombre,
+                                      CASE WHEN 1=1
+                                           THEN 'Recuperatorio-02'
+                                      END AS 'Instancia'
+                            FROM examen AS e) AS i
+                ON d2.nombre = i.nombre
+              """
+              
+desafio_03_R2 = sql^ consultaSQL
+
+
+desafio_03 = sql^"""
+                  SELECT * 
+                  FROM desafio_03_P1
+                  WHERE Nota IS NOT NULL
+                  UNION
+                  SELECT * 
+                  FROM desafio_03_P2
+                  WHERE Nota IS NOT NULL
+                  UNION
+                  SELECT * 
+                  FROM desafio_03_R1
+                  WHERE Nota IS NOT NULL
+                  UNION
+                  SELECT * 
+                  FROM desafio_03_R2
+                  WHERE Nota IS NOT NULL
+                  ORDER BY Instancia
+                 """
+
