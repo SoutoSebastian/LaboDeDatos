@@ -11,9 +11,9 @@ from inline_sql import sql, sql_val
 
 #%%
 
-carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
+#carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\ejSQL\\"
 
-#carpeta = "~/Escritorio/LaboDeDatos/ejSQL/"
+carpeta = "~/Escritorio/LaboDeDatos/ejSQL/"
 
 casos = pd.read_csv(carpeta+"casos.csv")
 
@@ -466,7 +466,9 @@ dataFrameResultado2 = sql^"""
                           FROM casosConProv
                           GROUP BY prov
                           HAVING casos_totales >1000
-                         """                         
+                         """                   
+
+
 
 #%%
 
