@@ -84,7 +84,7 @@ consulta_sql = """
                 GROUP BY "Country Dest Code";
                """
                
-inmigraciones00 = sql^consulta_sql
+inmigraciones00ARG = sql^consulta_sql
 
 consulta_sql = """
                 SELECT DISTINCT i.codigo, (i.inmigraciones00ARG + e.emigraciones00ARG) AS flujo_ARG
@@ -119,7 +119,29 @@ consulta_sql = """
 
 Pais = sql^consulta_sql
 
+#%%
+#Probando split en dataframe
 
+consulta_sql = """
+                SELECT DISTINCT redes_sociales, sede_id
+                FROM datos_completos
+               """
 
+redes_sociales0 = sql^consulta_sql
+
+redes_sociales0['redes_sociales'] = redes_sociales0['redes_sociales'].str.split(' // ')
+
+redes_sociales01 = redes_sociales0.explode('redes_sociales').reset_index(drop=True)
+
+consulta_sql = """
+                SELECT DISTINCT sede_id, redes_sociales
+                FROM redes_sociales01
+                WHERE redes_sociales IS NOT NULL 
+                    AND TRIM(redes_sociales) != '';
+               """
+
+redes_sociales = sql^consulta_sql
+
+ 
 
 
