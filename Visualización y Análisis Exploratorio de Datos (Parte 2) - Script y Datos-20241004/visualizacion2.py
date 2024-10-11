@@ -18,8 +18,8 @@ import seaborn as sns
 # Carpeta donde se encuentran los archivos a utilizar
 #carpeta = "~/Downloads/clase-12/scriptClase/"
 #carpeta = "C:/Users/ailen/Desktop/Visualizacion2/"
-carpeta = "~/Escritorio/LaboDeDatos/Visualización y Análisis Exploratorio de Datos (Parte 2) - Script y Datos-20241004/"
-
+#carpeta = "~/Escritorio/LaboDeDatos/Visualización y Análisis Exploratorio de Datos (Parte 2) - Script y Datos-20241004/"
+carpeta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\Visualización y Análisis Exploratorio de Datos (Parte 2) - Script y Datos-20241004\\"
 
 #%%##########################################################################
 #                                                                           #
