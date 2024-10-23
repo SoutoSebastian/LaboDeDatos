@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt # Para graficar series multiples
 from   matplotlib import ticker   # Para agregar separador de miles
 import seaborn as sns  
 
-ruta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP1\\"
+ruta = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP1\\TablasOriginales\\"
 
-archivo_secciones = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP1\\lista-secciones.csv"
+archivo_secciones = "C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP1\\TablasOriginales\\lista-secciones.csv"
 archivo_migraciones = 'datos_migraciones.csv'
 archivo_completo = 'lista-sedes-completos.csv'
 archivo_basico ='lista-sedes-basicos.csv'
@@ -23,6 +23,7 @@ datos_secciones = pd.read_csv(archivo_secciones)
 datos_migraciones = pd.read_csv(ruta + archivo_migraciones)
 datos_completos = pd.read_csv(ruta+archivo_completo, on_bad_lines = 'skip')
 datos_basicos = pd.read_csv(ruta+archivo_basico)
+
 
 #%%
 consulta_sql20 = """
