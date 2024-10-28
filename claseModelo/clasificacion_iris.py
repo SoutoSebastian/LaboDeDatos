@@ -150,6 +150,7 @@ clf_info = tree.DecisionTreeClassifier(criterion = "entropy", max_depth= 4)
 clf_info = clf_info.fit(X, Y)
 
 
+
 plt.figure(figsize= [15,10])
 tree.plot_tree(clf_info, feature_names = iris['feature_names'], class_names = iris['target_names'],filled = True, rounded = True, fontsize = 10)
 #%%
