@@ -14,22 +14,23 @@ import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from sklearn.metrics import recall_score
+import random as rd
+import copy 
+from sklearn.metrics import  precision_score, recall_score
 
 #bruno
 #prefijo = 'C:/Users/Bruno Goldfarb/Downloads/'
 
 #seba
-#prefijo = 'C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP2\\'
-
-#labo
-ruta ="/home/Estudiante/Escritorio/LaboDeDatos/TP2/"
+prefijo = 'C:\\Users\\Sebastián\\Documents\\LaboDeDatos\\TP2\\'
 
 
-data = pd.read_csv(ruta + 'TMNIST_Data.csv')
+data = pd.read_csv(prefijo + 'TMNIST_Data.csv')
 
 
 #%%
+
+#################ANALISIS EXPLORATORIO##########
 
 #con esta función imprimimos las primeras 10 imagenes del dataframe
 
@@ -42,6 +43,57 @@ def imprimir_img (data):
     
 
 imprimir_img(data)
+
+#%%
+
+X = data.iloc[:,2:]
+Y = data['labels']
+
+
+#%%
+#ia)
+n = 200
+indices = []
+for i in range(n):
+    indice = rd.randint(0,29899)
+    indices.append(indice)        
+muestreo = X.iloc[indices]    
+promedios = muestreo.mean(axis=0).tolist()
+muestreo.loc[len(muestreo)] = promedios
+
+#%%
+
+# muestreo, prom = sacarPromedioAleatorio(X, n)    
+def dibujarPromedio(muestreo):
+    n = 200
+    img = np.array(muestreo.iloc[n]).reshape((28,28))
+    plt.imshow(img, cmap='gray')
+    plt.show()
+dibujarPromedio(muestreo)
+#%%
+consulta_sql = """
+                SELECT DISTINCT * 
+                FROM data
+                WHERE labels == '1' OR  labels == '0';               
+               """             
+img1 = sql^consulta_sql
+n = 500
+indices = []
+data1 = img1.iloc[:,2:]
+for i in range(n):
+    indice = rd.randint(0, data1.shape[0])
+    indices.append(indice)
+muestreo = data1.iloc[indices]
+promedios = muestreo.mean(axis=0).tolist()
+img2 = np.array(promedios).reshape((28,28))
+
+# n = data1.shape[0]
+# data1.loc[len(muestreo)] = promedios
+# img = np.array(promedios).reshape((28,28))
+plt.imshow(img2, cmap='gray')
+plt.show()
+
+
 
 #%%
 
@@ -62,7 +114,8 @@ imprimir_img(img0)
 
 #%%
 
-#EJ 2
+######PUNTO 2: KNN###############
+
 
 #a
 #Armo df con digitos 0 y 1
@@ -88,18 +141,86 @@ cantidadXdigito = sql^consulta_sql
 #mismo numero de 0s y 1s, esta balanceado.
 
 #%%
+
+
+
+n = 500
+indices = []
+data1 = img01.iloc[:,2:]
+for i in range(n):
+    indice = rd.randint(0, data1.shape[0])
+    indices.append(indice)
+muestreo = data1.iloc[indices]
+promedios = muestreo.mean(axis=0).tolist()
+img2 = np.array(promedios).reshape((28,28))
+
+
+plt.imshow(img2, cmap='gray')
+plt.show()
+
+
+
+#%%
 #b
 
 #Primero separamos la data de los labels.
 
-X = data.iloc[:,2:]
-Y = data['labels']
+X = img01.iloc[:,2:]
+Y = img01['labels']
+
 
 #%%
-#Separamos en datos de train y test y tomo 3 atributos.
+#Separamos en datos de train y test.
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3) # 70% para train y 30% para test
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3, random_state = 42) # 70% para train y 30% para test
 
+
+
+
+
+
+#%%
+
+#defino una funcion que me arme el modelo de knn:
+    
+def modelo_knn(X_train, X_test, Y_test, Y_train,k):
+    
+    model = KNeighborsClassifier(n_neighbors = k)
+    model.fit(X_train, Y_train) 
+    Y_pred = model.predict(X_test) 
+
+    print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
+
+    recall = recall_score(Y_test, Y_pred, pos_label=1) 
+    print("Recall:", recall)
+
+    precision = precision_score(Y_test, Y_pred, pos_label=1)  
+    print("Precisión:", precision)
+
+    print(metrics.confusion_matrix(Y_test, Y_pred))
+
+#%%
+
+#########Me fijo que pasa con todos los atributos.
+
+modelo_knn(X_train, X_test, Y_test, Y_train, 5)
+
+#Muy buenas metricas pero se que hay muchos atributos que se podrian descartar.
+
+#%%
+
+#########Quiero ver que pasa si saco los bordes. 
+
+X_trainsb = X_train.iloc[:,92:696]
+X_testsb = X_test.iloc[:,92:696]
+
+
+#%%
+
+modelo_knn(X_trainsb, X_testsb, Y_test, Y_train, 5)
+
+#sacamos 180 atributos y las metricas siguen siendo muy buenas. Quiero disminuir la
+#cantidad de atributos.
 
 #%%
 
@@ -111,55 +232,32 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3) # 70%
 #tome 3 atributos al azar 
 
 
-X_train3 = X_train[[ '186','381', '661']]
-X_test3 = X_test[[ '186','381', '661']]
+X_train3 = X_train[[ '170','381', '661']]
+
+X_test3 = X_test[[ '170','381', '661']]
 
 
 #%%
 
-#ahora realizamos el modelo
-
-model = KNeighborsClassifier(n_neighbors = 5)
-model.fit(X_train3, Y_train) 
-Y_pred = model.predict(X_test3) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-metrics.confusion_matrix(Y_test, Y_pred)
+modelo_knn(X_train3, X_test3, Y_test, Y_train, 5)
 
 
-
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  # 'macro' es el promedio no ponderado
-print(f"Recall : {recall_multiclass:.4f}")
-
-metrics.confusion_matrix(Y_test, Y_pred)
-
-
+#no son malas las metricas, quiero ver si tomando a proposito otros valores tenemos mejores 
+#o peores.
 #%%
-
 #2
 
 #tome 3 que se que pocas imagenes tienen valorees distintos de 0 
-X_train3 = X_train[[ '200','201', '202']]
-X_test3 = X_test[[ '200','201', '202']]
+X_train3 = X_train[[ '165','174', '782']]
+X_test3 = X_test[[ '165','174', '782']]
 
 #%%
 
-model = KNeighborsClassifier(n_neighbors = 5)
-model.fit(X_train3, Y_train) 
-Y_pred = model.predict(X_test3) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-metrics.confusion_matrix(Y_test, Y_pred)
+modelo_knn(X_train3, X_test3, Y_test, Y_train, 5)
+#manda a todos los datos al 0 o al 1. 
 
-
-
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  # 'macro' es el promedio no ponderado
-print(f"Recall : {recall_multiclass:.4f}")
-
-metrics.confusion_matrix(Y_test, Y_pred)
-
-#muy baja se debe a que estas posiciones corresponden al borde
 
 #%%
-
 #3
 
 #tomo 3 atributos a proposito que se que tienen valores en la mayoria de los numeros
@@ -167,133 +265,192 @@ metrics.confusion_matrix(Y_test, Y_pred)
 X_train3 = X_train[[ '294','322', '550']]
 X_test3 = X_test[[ '294','322', '550']]
 
-#%%
-
-model = KNeighborsClassifier(n_neighbors = 5)
-model.fit(X_train3, Y_train) 
-Y_pred = model.predict(X_test3) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-metrics.confusion_matrix(Y_test, Y_pred)
-
-
-
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  # 'macro' es el promedio no ponderado
-print(f"Recall : {recall_multiclass:.4f}")
-
-metrics.confusion_matrix(Y_test, Y_pred)
-
-#exactitud y recall parecida a la del primer caso.
-
 
 #%%
-#Tomo los del 3) y modifico el numero de los vecinos a ver que pasa:
+
+modelo_knn(X_train3, X_test3, Y_test, Y_train, 5)
+#Metricas parecidas a las del primer caso pero pueden mejorar
+
+#%%
+#Voy a probar con un solo atributo, que seria el del medio:
+
+X_train1 = X_train[[ '406']]
+X_test1 = X_test[[ '406']]
+
+#%%
+
+modelo_knn(X_train1, X_test1, Y_test, Y_train, 5)
+
+#para ser un solo atributo esta bastante bien, voy a probar de agarrar 3 del medio.
+
+#%%
+#Voy a tomar 3 atributos del medio.
+
+X_train3 = X_train[[ '406', '520', '462']]
+X_test3 = X_test[[ '406', '520', '462']]
+
+modelo_knn(X_train3, X_test3, Y_test, Y_train, 5)
+
+#Logramos hacer que las metrcias suban eligiendo atributos que sabemos que pueden
+#diferenciar a los 1s de los 0s.
+
+#%%
+#Con los 3 atributos dados anteriormente, voy a ir variando la cantidad de vecinos y comparar
+
+exactitudes = []
+recalls = []
+precisiones = []
+indices = []
+
+for k in range (5,800,30):
     
-model = KNeighborsClassifier(n_neighbors = 12)
-model.fit(X_train3, Y_train) 
-Y_pred = model.predict(X_test3) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-metrics.confusion_matrix(Y_test, Y_pred)
+    model = KNeighborsClassifier(n_neighbors = k)
+    model.fit(X_train3, Y_train) 
+    Y_pred = model.predict(X_test3) 
+
+    exactitud = metrics.accuracy_score(Y_test, Y_pred)
+    recall = recall_score(Y_test, Y_pred, pos_label=1) 
+    precision = precision_score(Y_test, Y_pred, pos_label=1)  
+    
+    indices.append(k)
+    exactitudes.append(exactitud)
+    recalls.append(recall)
+    precisiones.append(precision)
+    
+#%%
+#Ahora quiero graficar los resultados:
+
+fig, ax = plt.subplots(figsize=(10,10))
+    
+plt.scatter(indices,exactitudes, c='blue',label='Exactitud', alpha=0.6, edgecolors='w', s=20)
+plt.scatter(indices,recalls, c='red',label='Recall', alpha=0.6, edgecolors='w', s=20)
+plt.scatter(indices,precisiones, c='green',label='Precisión', alpha=0.6, edgecolors='w', s=20)
 
 
+plt.plot(indices, exactitudes, c='blue', alpha=0.6)  # Línea azul para Exactitud
+plt.plot(indices, recalls, c='red', alpha=0.6)      # Línea roja para Recall
+plt.plot(indices, precisiones, c='green', alpha=0.6) # Línea verde para Precisión
 
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  # 'macro' es el promedio no ponderado
-print(f"Recall : {recall_multiclass:.4f}")
+plt.title('Métricas en función de vecinos', fontsize=16)
+plt.xlabel('Cantidad de vecinos', fontsize=14)
+plt.ylabel('Valor métrica', fontsize=14)
 
-metrics.confusion_matrix(Y_test, Y_pred)
-
-#aumenta un poco la exactitud, pero no obtendremos un buen modelo en terminos de exactitud.
-#Ya que 3 atributos no son representativos.
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.legend(title='Métrica')
+plt.show()    
 
 #%%
 
-#########Me fijo que pasa con todos los atributos.
+###########PUNTO 3: ARBOLES DE DECISION################
+#(Clasificación multiclase) 
 
-model = KNeighborsClassifier(n_neighbors = 5)
-model.fit(X_train, Y_train) 
-Y_pred = model.predict(X_test) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-#aumneta a 0.96
+#separo el modelo en train, testing y validation:
+    
+X, X_validation, Y, Y_validation = train_test_split(X, Y, test_size = 0.2) # 80% para train y 20% para validation
 
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  # 'macro' es el promedio no ponderado
-print(f"Recall : {recall_multiclass:.4f}")
-metrics.confusion_matrix(Y_test, Y_pred)
+
+
+X_train, x_test, Y_train, Y_test = train_test_split(X_train, Y_train, test_size = 0.3) #70% para train y 30% para testing
+
+#%%        
+
+cnombres = ['0', '1', '2', '3', '4', '5', '6', '7','8','9']
+
+#PROBAMOS CON DISTINTAS PROFUNDIDAES:
+    
+#depth= 1
+
+arbol = tree.DecisionTreeClassifier(criterion = "entropy", max_depth= 1)
+arbol = arbol.fit(X_train, Y_train)
+
+
+
+plt.figure(figsize= [15,10])
+tree.plot_tree(arbol,filled = True, rounded = True, fontsize = 10,class_names=cnombres)
+
 
 #%%
-
-#########Quiero ver que pasa si saco los bordes. 
-
-X = data.iloc[:,92:696]
-
-#%%
-#Separamos en datos de train y test y tomo 3 atributos.
-
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3) # 70% para train y 30% para test
-
-#%%
-
-model = KNeighborsClassifier(n_neighbors = 5)
-model.fit(X_train, Y_train) 
-Y_pred = model.predict(X_test) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
+#depth =5
+arbol = tree.DecisionTreeClassifier(criterion = "entropy", max_depth= 5)
+arbol = arbol.fit(X_train, Y_train)
 
 
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  
-print(f"Recall : {recall_multiclass:.4f}")
-metrics.confusion_matrix(Y_test, Y_pred)
 
-
-##descartando 184 atributos tenemos una precision parecida.
+plt.figure(figsize= [15,10])
+tree.plot_tree(arbol,filled = True, rounded = True, fontsize = 10,class_names=cnombres)
 
 #%%
-#y si aumento el numero de vecinos?
-
-model = KNeighborsClassifier(n_neighbors = 100)
-model.fit(X_train, Y_train) 
-Y_pred = model.predict(X_test) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
+#depth =10
+arbol = tree.DecisionTreeClassifier(criterion = "entropy", max_depth= 10)
+arbol = arbol.fit(X_train, Y_train)
 
 
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  
-print(f"Recall : {recall_multiclass:.4f}")
-metrics.confusion_matrix(Y_test, Y_pred)
 
-#Exactitud del modelo: 0.9460423634336678
+plt.figure(figsize= [15,10])
+tree.plot_tree(arbol,filled = True, rounded = True, fontsize = 10,class_names=cnombres)
+#seba dice: recontra overfil!
 
 #%%
+#PELIGRO AL CORRER ESTO TARDA MUCHISIMO!!!!!!!!!!!
 
-model = KNeighborsClassifier(n_neighbors = 1000)
-model.fit(X_train, Y_train) 
-Y_pred = model.predict(X_test) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
+Nrep = 5
+valores_n = range(1, 11)
+
+resultados_test_gini = np.zeros((Nrep, len(valores_n)))
+resultados_train_gini = np.zeros((Nrep, len(valores_n)))
+
+criterion= ["entropy","gini"]
+
+for i in range(Nrep):
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3)
+    for k in valores_n:
+        model = tree.DecisionTreeClassifier(criterion = 'gini', max_depth= k)
+        model.fit(X_train, Y_train) 
+        Y_pred = model.predict(X_test)
+        Y_pred_train = model.predict(X_train)
+        acc_test = metrics.accuracy_score(Y_test, Y_pred)
+        acc_train = metrics.accuracy_score(Y_train, Y_pred_train)
+        resultados_test_gini[i, k-1] = acc_test
+        resultados_train_gini[i, k-1] = acc_train
+        
+resultados_test_entropy = np.zeros((Nrep, len(valores_n)))
+resultados_train_entropy = np.zeros((Nrep, len(valores_n)))
+        
+for i in range(Nrep):
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3)
+    for k in valores_n:
+        model = tree.DecisionTreeClassifier(criterion = 'gini', max_depth= k)
+        model.fit(X_train, Y_train) 
+        Y_pred = model.predict(X_test)
+        Y_pred_train = model.predict(X_train)
+        acc_test = metrics.accuracy_score(Y_test, Y_pred)
+        acc_train = metrics.accuracy_score(Y_train, Y_pred_train)
+        resultados_test_entropy[i, k-1] = acc_test
+        resultados_train_entropy[i, k-1] = acc_train
+#%%
+
+promedios_train_gini = np.mean(resultados_train_gini,axis=0)
+promedios_test_gini= np.mean(resultados_test_gini,axis=0)
+
+promedios_train_entropy = np.mean(resultados_train_entropy,axis=0)
+promedios_test_entropy= np.mean(resultados_test_entropy,axis=0)
+#En todos los casos, mientrsa mas preguntas hacmoes, mejor precision tiene el modelo.pero con 10 tarda mucho. 
+#Definimos por usar depth = 9
+#%%
 
 
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  
-print(f"Recall : {recall_multiclass:.4f}")
-metrics.confusion_matrix(Y_test, Y_pred)
+#Ahora salgamos al mundo real, y con el modelo de depth = 9 intentemos predecir:
+    
+    
 
-#vemos como al aumentar el numero de vecinos esta provocando que baje la exactitud y el recall
-
-#%% 
-#y si pongo solo 1 vecino?
-
-
-model = KNeighborsClassifier(n_neighbors = 1)
-model.fit(X_train, Y_train) 
-Y_pred = model.predict(X_test) 
-print("Exactitud del modelo:", metrics.accuracy_score(Y_test, Y_pred))
-
-
-recall_multiclass = recall_score(Y_test, Y_pred, average='macro')  
-print(f"Recall : {recall_multiclass:.4f}")
-metrics.confusion_matrix(Y_test, Y_pred)
-
-#bastante bueno con 1. 
-
-
-
-
-
-
+    
+model = tree.DecisionTreeClassifier(criterion = 'gini', max_depth= 9)
+model.fit(X, Y) 
+Y_pred = model.predict(X_validation)
+Y_pred_train = model.predict(X)
+acc_test = metrics.accuracy_score(Y_validation, Y_pred)
+acc_train = metrics.accuracy_score(Y, Y_pred_train)
+metrics.confusion_matrix(Y, Y_pred_train)
 
 
 
