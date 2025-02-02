@@ -1,0 +1,17 @@
+"Nombre","Sexo","Edad","Instancia","Nota"
+"Ana","F",20,"Parcial-01",10
+"Bruno","M",19,"Parcial-01",2
+"Camila","F",20,"Parcial-01",3
+"Diego","M",20,"Parcial-01",1
+"Eva","F",30,"Parcial-01",7
+"Francisco","M",22,"Parcial-01",8
+"Bruno","M",19,"Recuperatorio-01",6
+"Camila","F",20,"Recuperatorio-01",7
+"Diego","M",20,"Recuperatorio-01",3
+"Ana","F",20,"Parcial-02",10
+"Bruno","M",19,"Parcial-02",7
+"Camila","F",20,"Parcial-02",7
+"Diego","M",20,"Parcial-02",1
+"Eva","F",30,"Parcial-02",9
+"Diego","M",20,"Recuperatorio-02",9
+"Francisco","M",22,"Recuperatorio-02",5

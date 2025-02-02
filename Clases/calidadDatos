@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct  4 09:30:46 2024
+
+@author: Estudiante
+"""
+
+import pandas as pd
+from inline_sql import sql, sql_val
+
+carpeta = "~/Escritorio/LaboDeDatos/"
+
+archivo = pd.read_excel(carpeta+"informacion-publica-dengue-zika-nacional-hasta-20201231_1(1).xlsx")
+
+#%%
+
+consulta_sql = """
+                SELECT COUNT(evento_nombre) AS cantNoStrings
+                FROM archivo
+                WHERE evento_nombre != 'Dengue' AND evento_nombre != 'Zika';
+               """
+
+cantNoStrings = sql^consulta_sql
